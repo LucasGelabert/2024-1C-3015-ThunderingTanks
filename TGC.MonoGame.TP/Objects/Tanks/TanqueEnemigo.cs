@@ -103,7 +103,7 @@ namespace ThunderingTanks.Objects.Tanks
 
             float terrainHeight = terrain.Height(X, Z);
 
-            Position = new Vector3(Position.X, terrainHeight - 500, Position.Z);
+            Position = new Vector3(Position.X, terrainHeight - 450, Position.Z);
 
             float distanceToPlayer = direction.Length();
             Direction = Vector3.Normalize(direction);

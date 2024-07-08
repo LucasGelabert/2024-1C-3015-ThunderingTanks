@@ -173,6 +173,7 @@ namespace ThunderingTanks.Objects.Tanks
                 trackOffset1 += 0.1f;
                 trackOffset2 += 0.1f;
                 isMoving = true;
+                _forward = false;
             }
 
             if (keyboardState.IsKeyDown(Keys.D))
@@ -245,7 +246,6 @@ namespace ThunderingTanks.Objects.Tanks
             if(_forward)
             {
                 pitchMatrix = Matrix.CreateRotationX(pitch);
-                _forward = false;
             } 
             else
                 pitchMatrix = Matrix.CreateRotationX(-pitch);
@@ -398,8 +398,6 @@ namespace ThunderingTanks.Objects.Tanks
             {
 
                 isDestroyed = true;
-                _currentLife = _maxLife;
-                _juegoIniciado = false;
 
             }
 

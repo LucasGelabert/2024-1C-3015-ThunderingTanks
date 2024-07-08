@@ -109,8 +109,6 @@ namespace ThunderingTanks
 
         private List<Trees> Arboles = new();
         private readonly int CantidadArboles = 80;
-        private List<AntiTanque> AntiTanques = new List<AntiTanque>();
-        private List<Object> gameObjects = new();
 
         #endregion
 
@@ -154,8 +152,7 @@ namespace ThunderingTanks
         private float tiempoTranscurrido = 0f;
         private float tiempo = 0f;
         private bool mostrandoMensaje = false;
-        private bool juegoPausado = false;
-
+        private bool pausarJuego = false;
         private int CantidadTanquesEnemigos = 1;
 
         #endregion
@@ -336,7 +333,7 @@ namespace ThunderingTanks
         {
             var time = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
             var timeForParticles = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
-            
+
 
             var elapsedTime = Convert.ToSingle(gameTime.TotalGameTime.TotalSeconds);
             _hud.elapsedTime = tiempo;
@@ -348,7 +345,7 @@ namespace ThunderingTanks
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 _juegoIniciado = false;
-                //Exit();
+            //Exit();
 
             BasicShader.Parameters["diffuseColor"].SetValue(diffuseColorValue);
             BasicShader.Parameters["ambientColor"].SetValue(ambientColorValue);
@@ -405,8 +402,9 @@ namespace ThunderingTanks
                 {
                     freeCameraIsActivated = true;
                 }
+                _menu.MasterSound = MasterSound;
             }
-            else if (mostrandoMensaje)
+            else if (pausarJuego)
             {
                 _hud.Update(Panzer, ref viewport, Puntos);
                 return;
@@ -553,11 +551,11 @@ namespace ThunderingTanks
                 spriteBatch.Begin();
                 _menu.Draw(spriteBatch);
                 spriteBatch.End();
-                
+
                 #endregion
 
             }
-            else if(freeCameraIsActivated)
+            else if (freeCameraIsActivated)
             {
                 #region Pass 1
 
@@ -710,7 +708,7 @@ namespace ThunderingTanks
                 _hud.RayPosition = ray.Position;
 
                 Gizmos.DrawLine(ray.Position, (ray.Position + NormalizedCanonDirection * 1000), Color.Blue);
-                    
+
                 if (DrawGizmos)
                 {
                     _hud.DrawDebug = true;
@@ -901,7 +899,12 @@ namespace ThunderingTanks
                     Panzer.CollidingPosition = Projectiles[j].Position + deltaY;
                     Projectiles.Remove(Projectiles[j]);
                     Console.WriteLine("Colisión detectada de proyectil con una roca.");
-
+                    if (Panzer.isDestroyed)
+                    {
+                        Puntos = (int) Puntos * 0.9f;
+                        Panzer._currentLife = Panzer._maxLife;
+                        _juegoIniciado = false;
+                    }
                 }
 
                 if (Projectiles.Count <= j || Projectiles.Count == 0)
@@ -935,7 +938,7 @@ namespace ThunderingTanks
                             EliminatedEnemyTanks.Add(EnemyTanks[i]);
                             TanksEliminados++;
                             EnemyTanks.RemoveAt(i);
-                            Puntos += (i + 1) * Oleada;
+                            Puntos += (i + 1) * Oleada * 100;
                         }
 
                         if (TanksEliminados == CantidadTanquesEnemigos)
@@ -959,11 +962,13 @@ namespace ThunderingTanks
                             }
                             TanksEliminados = 0;
                             Oleada++;
+                            /*
                             if (Oleada == 10)
                             {
                                 Panzer._currentLife = Panzer._maxLife;
                                 Exit();
                             }
+                            */
                         }
                         break;
                     }
@@ -1217,7 +1222,21 @@ namespace ThunderingTanks
         /// <param name="time"></param>
         private void UpdateOleada(float time)
         {
-            if (Oleada != OleadaAnterior)
+            if (Oleada == 11)
+            {
+                mostrandoMensaje = false;
+                tiempoTranscurrido += time;
+                _hud.juegoFinalizado = true;
+                pausarJuego = true;
+                if (tiempoTranscurrido >= 4f)
+                {
+                    _hud.juegoFinalizado = false;
+                    tiempoTranscurrido = 0f;
+                    pausarJuego = false;
+                    _juegoIniciado = false;
+                }
+            }
+            else if (Oleada != OleadaAnterior)
             {
                 mostrandoMensaje = true;
                 tiempoTranscurrido = 0f;
@@ -1229,11 +1248,13 @@ namespace ThunderingTanks
                 tiempoTranscurrido += time;
                 var tiempoHud = -(tiempoTranscurrido - 3f);
                 _hud.time = tiempoHud;
+                pausarJuego = true;
                 if (tiempoTranscurrido >= 3f)
                 {
                     _hud.siguienteOleada = false;
                     mostrandoMensaje = false;
                     tiempoTranscurrido = 0f;
+                    pausarJuego = false;
                 }
                 else
                 {

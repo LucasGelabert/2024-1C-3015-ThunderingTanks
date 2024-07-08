@@ -231,7 +231,7 @@ namespace ThunderingTanks.Objects
                 spriteBatch.DrawString(WarIsOver, ": A", new Vector2(ScreenHeight + 270, 400), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
                 spriteBatch.DrawString(WarIsOver, ": D", new Vector2(ScreenHeight + 270, 450), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
 
-                spriteBatch.DrawString(WarIsOver, ": CLICK DERECHO", new Vector2(ScreenHeight + 270, 500), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                spriteBatch.DrawString(WarIsOver, ": CLICK IZQUIERDO", new Vector2(ScreenHeight + 270, 500), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
                 spriteBatch.DrawString(WarIsOver, ": ESC", new Vector2(ScreenHeight + 270, 550), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
                 spriteBatch.DrawString(WarIsOver, "SI SE VA AL MENU, SE REINICIA LA POSICION A LA INICIAL", new Vector2(ScreenHeight + 50, 700), Color.GreenYellow, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
                 spriteBatch.DrawString(WarIsOver, "UNA VEZ ADENTRO DEL JUEGO", new Vector2(ScreenHeight + 150, 675), Color.GreenYellow, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
@@ -266,6 +266,7 @@ namespace ThunderingTanks.Objects
 
                 var mouseState = Mouse.GetState();
                 spriteBatch.Draw(_cursorTexture, new Vector2(mouseState.X, mouseState.Y), Color.White);
+
             }
         }
     }

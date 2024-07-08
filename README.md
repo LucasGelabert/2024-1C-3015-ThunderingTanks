@@ -19,15 +19,19 @@ D               | Rotacion derecha
 C               | Debug mode
 G               | God mode
 Click Izquierdo | Disparo de cañon
+Esc             | Menu
+
+## ¿En que consiste?
+El sistema consta de oleadas, donde en cada una se agrega un tanque enemigo. Estos tanques disparan al jugador en intervalos de tiempo regulares. Cada tanque enemigo soporta un disparo, mientras que el jugador puede resistir dos disparos de los tanques enemigos. Al finalizar las 10 oleadas, el juego termina, se muestra el puntaje final y se vuelve al menú. Si se regresa al menú y luego se continúa jugando, el tanque del jugador mantendrá todos los puntos y su vida actual, pero volverá a su posición inicial. Si el tanque enemigo es destruido, el puntaje del jugador disminuirá en un 10%.
 
 ## Integrantes
 
 TGC, Tgcito  |  Apellido, Nombre
 ------------ | -------------
-| ![Lucas Gelabert](/FotosTGCitos/Lucas%20Gelabert.png)       | Lucas Gelabert    |
-| ![Santiago Saucedo](/FotosTGCitos/Santiago%20Saucedo.png)   | Santiago Saucedo  |
-| ![Simon Cutrera](/FotosTGCitos/Simon%20Cutrera.png)         | Simon Cutrera     |
-| ![Tomas Zubizarreta](/FotosTGCitos/Tomas%20Zubizarreta.png) | Tomas Zubizarreta |
+| ![Lucas Gelabert](/FotosTGCitos/Lucas%20Gelabert.png)       | Gelabert, Lucas    |
+| ![Santiago Saucedo](/FotosTGCitos/Santiago%20Saucedo.png)   | Saucedo, Santiago  |
+| ![Simon Cutrera](/FotosTGCitos/Simon%20Cutrera.png)         | Cutrera, Simon     |
+| ![Tomas Zubizarreta](/FotosTGCitos/Tomas%20Zubizarreta.png) | Zubizarreta, Tomas |
 
 ## Capturas
 
@@ -36,3 +40,4 @@ TGC, Tgcito  |  Apellido, Nombre
 ![Gameplay](/FotosGameplay/Gameplay.png)
 
 ## Game Play
+[Para ver el video haga click aqui](https://youtu.be/owyK6Yvhs0s)

@@ -50,6 +50,7 @@ namespace ThunderingTanks.Objects
 
         public int _maxLifeBarWidth;
         public bool siguienteOleada;
+        public bool juegoFinalizado;
 
         #region Debug
         public Vector3 TankPosition { get; set; }
@@ -105,6 +106,7 @@ namespace ThunderingTanks.Objects
 
             _maxLifeBarWidth = lifeBar.Width;
             siguienteOleada = false;
+            juegoFinalizado = false;
         }
 
         public void Update(Tank Panzer, ref Viewport viewport, float TanksEliminados)
@@ -186,9 +188,15 @@ namespace ThunderingTanks.Objects
 
             if(siguienteOleada)
             {
-                spriteBatch.DrawString(WarIsOver, "TIEMPO SIGUIENTE OLEADA: " + (int)time + " SEGS", new Vector2(ScreenWidth - 1050, ScreenHeight - 475), Color.GreenYellow);
-                spriteBatch.DrawString(WarIsOver, "OLEADA COMPLETADA", new Vector2(ScreenWidth - 1005, ScreenHeight - 525), Color.GreenYellow);
-                spriteBatch.DrawString(WarIsOver, "SIGUIENTE OLEADA: " + Oleada, new Vector2(ScreenWidth - 1000, ScreenHeight - 500), Color.GreenYellow);
+                spriteBatch.DrawString(WarIsOver, "OLEADA COMPLETADA", new Vector2(ScreenWidth - 1055, ScreenHeight - 525), Color.GreenYellow);
+                spriteBatch.DrawString(WarIsOver, "SIGUIENTE OLEADA: " + Oleada, new Vector2(ScreenWidth - 1050, ScreenHeight - 500), Color.GreenYellow);
+                spriteBatch.DrawString(WarIsOver, "TIEMPO SIGUIENTE OLEADA: " + (int)time + " SEGS", new Vector2(ScreenWidth - 1110, ScreenHeight - 475), Color.GreenYellow);
+            }
+            if(juegoFinalizado)
+            {
+                spriteBatch.DrawString(WarIsOver, "OLEADA COMPLETADA", new Vector2(ScreenWidth - 1060, ScreenHeight - 525), Color.GreenYellow);
+                spriteBatch.DrawString(WarIsOver, "JUEGO FINALIZADO", new Vector2(ScreenWidth - 1045, ScreenHeight - 500), Color.GreenYellow);
+                spriteBatch.DrawString(WarIsOver, "PUNTAJE FINAL: " + puntos, new Vector2(ScreenWidth - 1040, ScreenHeight - 475), Color.GreenYellow);
             }
 
             if(DrawDebug)
