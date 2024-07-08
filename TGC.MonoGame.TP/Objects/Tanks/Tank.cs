@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using ThunderingTanks.Cameras;
 using ThunderingTanks.Collisions;
 
@@ -52,6 +53,7 @@ namespace ThunderingTanks.Objects.Tanks
         private bool collided;
         public Matrix TurretMatrix { get; set; }
         public Matrix CannonMatrix { get; set; }
+        public Matrix pitchMatrix { get; set; }
         public float FireRate { get; set; }
         public float TimeSinceLastShot;
         public float GunRotationFinal { get; set; }
@@ -68,13 +70,15 @@ namespace ThunderingTanks.Objects.Tanks
         public Vector3 MinBox = new(0, 0, 0);
         public Vector3 MaxBox = new(0, 0, 0);
         public bool isColliding { get; set; } = false;
-        private bool isRotating { get; set; } = false;  
+        private bool isRotating { get; set; } = false;
+        private bool _forward { get; set; } = false;
 
         public Vector3 CollidingPosition { get; set; }
 
         public Texture2D LifeBar { get; set; }
         public Rectangle _lifeBarRectangle;
 
+        public float pitch;
         public int _maxLife = 50;
         public int _currentLife;
         public int _numberOfProyectiles;
@@ -154,6 +158,7 @@ namespace ThunderingTanks.Objects.Tanks
                 trackOffset1 -= 0.1f;
                 trackOffset2 -= 0.1f;
                 isMoving = true;
+                _forward = true;
             }
 
             if (keyboardState.IsKeyDown(Keys.S) && !isColliding)
@@ -228,12 +233,22 @@ namespace ThunderingTanks.Objects.Tanks
 
             Direction = new Vector3(X, terrainHeight - 400, Z);
 
-            float currentHeight = terrain.Height(Direction.X, Direction.Z);
-            float previousHeight = terrain.Height(LastPosition.X, LastPosition.Z);
-            float heightDifference = -(currentHeight - previousHeight);
+            if (isMoving)
+            {
+                float currentHeight = terrain.Height(Direction.X, Direction.Z);
+                float previousHeight = terrain.Height(LastPosition.X, LastPosition.Z);
+                float heightDifference = -(currentHeight - previousHeight);
 
-            float pitch = (float)Math.Atan2(heightDifference, Vector3.Distance(new Vector3(Direction.X, 0, Direction.Z), new Vector3(LastPosition.X, 0, LastPosition.Z)));
-            Matrix pitchMatrix = Matrix.CreateRotationX(pitch);
+                pitch = (float)Math.Atan2(heightDifference, Vector3.Distance(new Vector3(Direction.X, 0, Direction.Z), new Vector3(LastPosition.X, 0, LastPosition.Z)));
+            }
+
+            if(_forward)
+            {
+                pitchMatrix = Matrix.CreateRotationX(pitch);
+                _forward = false;
+            } 
+            else
+                pitchMatrix = Matrix.CreateRotationX(-pitch);
 
             Position = Direction + new Vector3(0f, 500f, 0f);
 
@@ -383,6 +398,7 @@ namespace ThunderingTanks.Objects.Tanks
             {
 
                 isDestroyed = true;
+                _currentLife = _maxLife;
                 _juegoIniciado = false;
 
             }

@@ -48,6 +48,7 @@ namespace ThunderingTanks.Objects.Tanks
 
         public Matrix turretWorld { get; set; }
         public Matrix cannonWorld { get; set; }
+        public Matrix pitchMatrix  { get; set; }
         private Vector3 NormalizedMovement { get; set; }
         private Vector3 LastPosition { get; set; }
 
@@ -57,6 +58,7 @@ namespace ThunderingTanks.Objects.Tanks
         public Vector3 Dimensiones2 = new(200, 250, 300);
 
         public float shootInterval;
+        public float pitch;
         public float lifeSpan;
         public float life = 5;
         private float trackOffset = 0;
@@ -101,18 +103,13 @@ namespace ThunderingTanks.Objects.Tanks
 
             float terrainHeight = terrain.Height(X, Z);
 
-            Position = new Vector3(Position.X, terrainHeight - 400, Position.Z);
+            Position = new Vector3(Position.X, terrainHeight - 500, Position.Z);
 
             float distanceToPlayer = direction.Length();
             Direction = Vector3.Normalize(direction);
 
 
-
-            if (distanceToPlayer < 2500f)
-            {
-                TankVelocity = 0f;
-            }
-            else if (Stop == true)
+            if(Stop == true)
             {
                 TankVelocity = 0f;
                 GunRotationFinal = 0f;
@@ -123,30 +120,51 @@ namespace ThunderingTanks.Objects.Tanks
             }
             else
             {
-                Rotation = (float)Math.Atan2(Direction.X, Direction.Z);
-                GunElevation = (float)Math.Atan2(playerPosition.Y - Position.Y, distanceToPlayer);
+                if (distanceToPlayer < 2500f)
+                {
+                    TankVelocity = 0f;
+                    Rotation = (float)Math.Atan2(Direction.X, Direction.Z);
+                    GunElevation = (float)Math.Atan2(playerPosition.Y - Position.Y, distanceToPlayer);
 
-                GunRotationFinal = Rotation;
-                TankVelocity = 180f;
+                    GunRotationFinal = Rotation;
+                    TankVelocity = 180f;
 
-                LastPosition = Position;
-
-                Position += Direction * TankVelocity * time;
-                if (Direction.Y > 0)
-                    trackOffset += 0.1f;
+                    LastPosition = Position;
+                }
                 else
-                    trackOffset -= 0.1f;
+                {
+                    Rotation = (float)Math.Atan2(Direction.X, Direction.Z);
+                    GunElevation = (float)Math.Atan2(playerPosition.Y - Position.Y, distanceToPlayer);
 
-                NormalizedMovement += Position - LastPosition;
-                NormalizedMovement = new Vector3(NormalizedMovement.X, terrainHeight - 400, NormalizedMovement.Z);
+                    GunRotationFinal = Rotation;
+                    TankVelocity = 180f;
 
-                TankBox = new BoundingBox(MinBox + NormalizedMovement, MaxBox + NormalizedMovement);
+                    LastPosition = Position;
+
+                    Position += Direction * TankVelocity * time;
+                    if (Direction.Y > 0)
+                        trackOffset += 0.1f;
+                    else
+                        trackOffset -= 0.1f;
+
+                    NormalizedMovement += Position - LastPosition;
+                    NormalizedMovement = new Vector3(NormalizedMovement.X, terrainHeight - 400, NormalizedMovement.Z);
+
+                    TankBox = new BoundingBox(MinBox + NormalizedMovement, MaxBox + NormalizedMovement);
+
+                    float currentHeight = terrain.Height(Direction.X, Direction.Z);
+                    float previousHeight = terrain.Height(LastPosition.X, LastPosition.Z);
+                    float heightDifference = -(currentHeight - previousHeight);
+
+                    pitch = (float)Math.Atan2(heightDifference, Vector3.Distance(new Vector3(Direction.X, 0, Direction.Z), new Vector3(LastPosition.X, 0, LastPosition.Z)));
+                    pitchMatrix = Matrix.CreateRotationX(pitch);
+                }
+
+                PanzerMatrix = Matrix.CreateRotationY(Rotation) * Matrix.CreateTranslation(Position);
+                turretWorld = Matrix.CreateRotationY(GunRotationFinal) * Matrix.CreateTranslation(Position);
+                cannonWorld = Matrix.CreateScale(100f) * Matrix.CreateRotationX(GunElevation) * turretWorld;
             }
-
-            PanzerMatrix = Matrix.CreateRotationY(Rotation) * Matrix.CreateTranslation(Position);
-            turretWorld = Matrix.CreateRotationY(GunRotationFinal) * Matrix.CreateTranslation(Position);
-            cannonWorld = Matrix.CreateScale(100f) * Matrix.CreateRotationX(GunElevation) * turretWorld;
-        }
+        }   
 
         public void Draw(Matrix world, Matrix view, Matrix projection, GraphicsDevice _GraphicsDevice)
         {

@@ -152,10 +152,11 @@ namespace ThunderingTanks
         public float OleadaAnterior;
         public float Puntos;
         private float tiempoTranscurrido = 0f;
+        private float tiempo = 0f;
         private bool mostrandoMensaje = false;
         private bool juegoPausado = false;
 
-        private readonly int CantidadTanquesEnemigos = 4;
+        private int CantidadTanquesEnemigos = 1;
 
         #endregion
 
@@ -335,9 +336,10 @@ namespace ThunderingTanks
         {
             var time = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
             var timeForParticles = Convert.ToSingle(gameTime.ElapsedGameTime.TotalSeconds);
+            
 
             var elapsedTime = Convert.ToSingle(gameTime.TotalGameTime.TotalSeconds);
-            _hud.elapsedTime = elapsedTime;
+            _hud.elapsedTime = tiempo;
             _hud.Oleada = Oleada;
             //particleSystem.AddParticle(new Vector2(400, 400));
             //particleSystem.Update(timeForParticles);
@@ -345,7 +347,8 @@ namespace ThunderingTanks
             UpdateOleada(time);
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+                _juegoIniciado = false;
+                //Exit();
 
             BasicShader.Parameters["diffuseColor"].SetValue(diffuseColorValue);
             BasicShader.Parameters["ambientColor"].SetValue(ambientColorValue);
@@ -388,7 +391,7 @@ namespace ThunderingTanks
                 _lightCamera.Position = lightPosition;
                 _lightCamera.BuildView();
 
-                Panzer.Direction = new Vector3(10, 0, 0);
+                Panzer.Direction = new Vector3(-5000, 0, -11000);
                 Panzer.isDestroyed = false;
 
                 Panzer.PanzerMatrix = Matrix.CreateRotationY(MathHelper.ToRadians(-10));
@@ -417,6 +420,7 @@ namespace ThunderingTanks
             }
             else
             {
+                tiempo += time;
                 lightPosition = new Vector3(0, 50000, 0);
 
                 if (!StartGame)
@@ -549,7 +553,7 @@ namespace ThunderingTanks
                 spriteBatch.Begin();
                 _menu.Draw(spriteBatch);
                 spriteBatch.End();
-                Panzer._currentLife = Panzer._maxLife;
+                
                 #endregion
 
             }
@@ -946,6 +950,7 @@ namespace ThunderingTanks
                                  TanksEliminados--;
                              }
                              */
+                            CantidadTanquesEnemigos += 1;
                             AgregarTanquesEnemigos(CantidadTanquesEnemigos);
                             for (int k = 0; k < CantidadTanquesEnemigos; k++)
                             {
@@ -1222,6 +1227,8 @@ namespace ThunderingTanks
             if (mostrandoMensaje)
             {
                 tiempoTranscurrido += time;
+                var tiempoHud = -(tiempoTranscurrido - 3f);
+                _hud.time = tiempoHud;
                 if (tiempoTranscurrido >= 3f)
                 {
                     _hud.siguienteOleada = false;

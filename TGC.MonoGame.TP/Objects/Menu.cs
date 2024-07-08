@@ -32,8 +32,11 @@ namespace ThunderingTanks.Objects
 
         #region BOTONS
 
+        private bool controlsMenuActive = false;
+        private Rectangle _backButton;
         private Rectangle _playButton;
         private Rectangle _exitButton;
+        private Rectangle _controlsButton;
         private Rectangle _soundOnButton;
         private Rectangle _soundOffButton;
         private Texture2D RectangleButtonHover { get; set; }
@@ -64,11 +67,13 @@ namespace ThunderingTanks.Objects
             int buttonHeight = 200;
             int buttonSpacing = 20;
 
-            int buttonY = (int) (ScreenHeight - 2 * buttonHeight - buttonSpacing) / 2;           
-            int buttonX = (int) ScreenWidth - buttonWidth - 300;
+            int buttonY = (int)(ScreenHeight - 3 * buttonHeight - buttonSpacing) / 2;
+            int buttonX = (int)ScreenWidth - buttonWidth - 300;
 
             _playButton = new Rectangle(buttonX, buttonY, buttonWidth, buttonHeight);
-            _exitButton = new Rectangle(buttonX, buttonY + buttonHeight + buttonSpacing, buttonWidth, buttonHeight);
+            _controlsButton = new Rectangle(buttonX, buttonY + buttonHeight + buttonSpacing, buttonWidth, buttonHeight);
+            _exitButton = new Rectangle(buttonX, buttonY + 2 * buttonHeight + buttonSpacing, buttonWidth, buttonHeight);
+            _backButton = new Rectangle(buttonX, buttonY + 3 * buttonHeight + buttonSpacing, buttonWidth, buttonHeight);
 
             _soundOnButton = new Rectangle(50, (int)(ScreenHeight - 300), 100, 100);
             _soundOffButton = new Rectangle(50, (int)(ScreenHeight - 300), 100, 100);
@@ -103,104 +108,165 @@ namespace ThunderingTanks.Objects
             if (mouseState.LeftButton == ButtonState.Released)
                 ResetMouse = true;
 
-            if (mouseState.LeftButton == ButtonState.Pressed)
+            if (controlsMenuActive)
             {
-                if (_playButton.Contains(mousePosition))
+                // Logica del menu de controles
+                if (mouseState.LeftButton == ButtonState.Pressed && _backButton.Contains(mousePosition))
                 {
-                    juegoIniciado = true;
-                    MediaPlayer.Stop();
-                }
-                else if (_exitButton.Contains(mousePosition))
-                {
-                    Environment.Exit(0); 
-                }
-                if (SoundIsOn && _soundOffButton.Contains(mousePosition) && ResetMouse)
-                {
-                    if (MediaPlayer.State == MediaState.Playing)
-                        MediaPlayer.Pause();
-
-                    SoundIsOn = false;
-                    ResetMouse = false;
-                }
-                else if (!SoundIsOn && _soundOnButton.Contains(mousePosition) && ResetMouse)
-                {
-                    if (MediaPlayer.State == MediaState.Paused)
-                        MediaPlayer.Resume();
-
+                    controlsMenuActive = false;
                     SoundIsOn = true;
                     ResetMouse = false;
                 }
-            }
 
-            if (_playButton.Contains(mousePosition))
-            {
-                PlayButton = PlayButtonHover;
+                if (_backButton.Contains(mousePosition))
+                {
+                    RectangleButton = RectangleButtonHover;
+                }
+                else
+                {
+                    RectangleButton = RectangleButtonNormal;
+                }
             }
             else
             {
-                PlayButton = PlayButtonNormal;
-            }
+                if (mouseState.LeftButton == ButtonState.Pressed)
+                {
+                    if (_playButton.Contains(mousePosition))
+                    {
+                        juegoIniciado = true;
+                        MediaPlayer.Stop();
+                    }
+                    else if (_exitButton.Contains(mousePosition))
+                    {
+                        Environment.Exit(0);
+                    }
+                    else if (_controlsButton.Contains(mousePosition))
+                    {
+                        controlsMenuActive = true;
+                    }
+                    if (SoundIsOn && _soundOffButton.Contains(mousePosition) && ResetMouse)
+                    {
+                        if (MediaPlayer.State == MediaState.Playing)
+                            MediaPlayer.Pause();
 
-            if (_exitButton.Contains(mousePosition))
-            {
-                RectangleButton = RectangleButtonHover;
-            }
-            else
-            {
-                RectangleButton = RectangleButtonNormal;
-            }
+                        SoundIsOn = false;
+                        ResetMouse = false;
+                    }
+                    else if (!SoundIsOn && _soundOnButton.Contains(mousePosition) && ResetMouse)
+                    {
+                        if (MediaPlayer.State == MediaState.Paused)
+                            MediaPlayer.Resume();
 
-            if (_soundOnButton.Contains(mousePosition))
-            {
-                SoundOnButton = SoundOnButtonHover;
-            }
-            else
-            {
-                SoundOnButton = SoundOnButtonNormal;
-            }
+                        SoundIsOn = true;
+                        ResetMouse = false;
+                    }
+                }
 
-            if (_soundOffButton.Contains(mousePosition))
-            {
-                SoundOffButton = SoundOffButtonHover;
-            }
-            else
-            {
-                SoundOffButton = SoundOffButtonNormal;
-            }
+                // Logica para botones de menu principal
+                if (_playButton.Contains(mousePosition))
+                {
+                    PlayButton = PlayButtonHover;
+                }
+                else
+                {
+                    PlayButton = PlayButtonNormal;
+                }
 
-            if (_playing)
-            {
-                MediaPlayer.Play(backgroundSound);
-                _playing = false;
-            }
+                if (_exitButton.Contains(mousePosition))
+                {
+                    RectangleButton = RectangleButtonHover;
+                }
+                else
+                {
+                    RectangleButton = RectangleButtonNormal;
+                }
 
+                if (_soundOnButton.Contains(mousePosition))
+                {
+                    SoundOnButton = SoundOnButtonHover;
+                }
+                else
+                {
+                    SoundOnButton = SoundOnButtonNormal;
+                }
+
+                if (_soundOffButton.Contains(mousePosition))
+                {
+                    SoundOffButton = SoundOffButtonHover;
+                }
+                else
+                {
+                    SoundOffButton = SoundOffButtonNormal;
+                }
+
+                if (_playing)
+                {
+                    MediaPlayer.Play(backgroundSound);
+                    _playing = false;
+                }
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-
-            if (SoundIsOn)
+            if (controlsMenuActive)
             {
-                spriteBatch.Draw(SoundOnButton, _soundOnButton, Color.Gray);
+                // Dibujar el menu de controles
+                spriteBatch.Draw(RectangleButton, _backButton, Color.Gray);
+                Vector2 backTextPosition = new Vector2(_backButton.X + (_backButton.Width - (_font.MeasureString("back").X + 100)) / 2, _backButton.Y + (_backButton.Height - (_font.MeasureString("back").Y + 70)) / 2);
+
+                spriteBatch.DrawString(WarIsOver, "BACK", backTextPosition, Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 0f);
+
+                spriteBatch.DrawString(WarIsOver, "CONTROLES", new Vector2(ScreenHeight + 50, 200), Color.SandyBrown, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                spriteBatch.DrawString(WarIsOver, "ADELANTE", new Vector2(ScreenHeight + 50, 300), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                spriteBatch.DrawString(WarIsOver, "ATRAS", new Vector2(ScreenHeight + 50, 350), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                spriteBatch.DrawString(WarIsOver, "IZQUIERDA", new Vector2(ScreenHeight + 50, 400), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                spriteBatch.DrawString(WarIsOver, "DERECHA", new Vector2(ScreenHeight + 50, 450), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+
+                spriteBatch.DrawString(WarIsOver, "DISPARAR", new Vector2(ScreenHeight + 50, 500), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                spriteBatch.DrawString(WarIsOver, "PAUSA", new Vector2(ScreenHeight + 50, 550), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+
+                spriteBatch.DrawString(WarIsOver, ": W", new Vector2(ScreenHeight + 270, 300), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                spriteBatch.DrawString(WarIsOver, ": S", new Vector2(ScreenHeight + 270, 350), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                spriteBatch.DrawString(WarIsOver, ": A", new Vector2(ScreenHeight + 270, 400), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                spriteBatch.DrawString(WarIsOver, ": D", new Vector2(ScreenHeight + 270, 450), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+
+                spriteBatch.DrawString(WarIsOver, ": CLICK DERECHO", new Vector2(ScreenHeight + 270, 500), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                spriteBatch.DrawString(WarIsOver, ": ESC", new Vector2(ScreenHeight + 270, 550), Color.White, 0f, Vector2.Zero, 2f, SpriteEffects.None, 0f);
+                spriteBatch.DrawString(WarIsOver, "SI SE VA AL MENU, SE REINICIA LA POSICION A LA INICIAL", new Vector2(ScreenHeight + 50, 700), Color.GreenYellow, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+                spriteBatch.DrawString(WarIsOver, "UNA VEZ ADENTRO DEL JUEGO", new Vector2(ScreenHeight + 150, 675), Color.GreenYellow, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+
+                var mouseState = Mouse.GetState();
+                spriteBatch.Draw(_cursorTexture, new Vector2(mouseState.X, mouseState.Y), Color.White);
             }
             else
             {
-                spriteBatch.Draw(SoundOffButton, _soundOffButton, Color.Gray);
+                if (SoundIsOn)
+                {
+                    spriteBatch.Draw(SoundOnButton, _soundOnButton, Color.Gray);
+                }
+                else
+                {
+                    spriteBatch.Draw(SoundOffButton, _soundOffButton, Color.Gray);
+                }
+
+                spriteBatch.Draw(PlayButton, _playButton, Color.Gray);
+                spriteBatch.Draw(RectangleButton, _controlsButton, Color.Gray);
+                spriteBatch.Draw(RectangleButton, _exitButton, Color.Gray);
+
+                spriteBatch.DrawString(WarIsOver, "THUNDERING TANKS", new Vector2(450, 200), Color.SandyBrown);
+                spriteBatch.DrawString(WarIsOver, "VOLUMEN = " + MasterSound.ToString("P"), new Vector2(50, ScreenHeight - 200), Color.SaddleBrown);
+
+                Vector2 controlsTextPosition = new Vector2(_controlsButton.X + (_controlsButton.Width - (_font.MeasureString("Controls").X + 220)) / 2, _controlsButton.Y + (_controlsButton.Height - (_font.MeasureString("Controls").Y + 70)) / 2);
+
+                Vector2 exitTextPosition = new Vector2(_exitButton.X + (_exitButton.Width - (_font.MeasureString("SALIR").X + 100)) / 2, _exitButton.Y + (_exitButton.Height - (_font.MeasureString("SALIR").Y + 70)) / 2);
+
+                spriteBatch.DrawString(WarIsOver, "SALIR", exitTextPosition, Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 0f);
+                spriteBatch.DrawString(WarIsOver, "CONTROLES", controlsTextPosition, Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 0f);
+
+                var mouseState = Mouse.GetState();
+                spriteBatch.Draw(_cursorTexture, new Vector2(mouseState.X, mouseState.Y), Color.White);
             }
-
-            spriteBatch.Draw(PlayButton, _playButton, Color.Gray);
-            spriteBatch.Draw(RectangleButton, _exitButton, Color.Gray);
-
-            spriteBatch.DrawString(WarIsOver, "THUNDERING TANKS", new Vector2(450,  200), Color.SandyBrown);
-            spriteBatch.DrawString(WarIsOver, "VOLUMEN = " + MasterSound.ToString("P"), new Vector2(50, ScreenHeight - 200), Color.SaddleBrown);
-           
-            Vector2 exitTextPosition = new Vector2(_exitButton.X + (_exitButton.Width - (_font.MeasureString("Exit").X + 70)) / 2, _exitButton.Y + (_exitButton.Height - (_font.MeasureString("Exit").Y + 70)) / 2);
-
-            spriteBatch.DrawString(WarIsOver, "EXIT", exitTextPosition, Color.White, 0f, Vector2.Zero, 3f, SpriteEffects.None, 0f);
-
-            var mouseState = Mouse.GetState();
-
-            spriteBatch.Draw(_cursorTexture, new Vector2(mouseState.X, mouseState.Y), Color.White);
         }
     }
 }

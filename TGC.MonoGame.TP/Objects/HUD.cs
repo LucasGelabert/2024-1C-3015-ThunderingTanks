@@ -61,6 +61,7 @@ namespace ThunderingTanks.Objects
         public Vector3 RayDirection { get; set; }
 
         public float elapsedTime { get; set; }
+        public float time { get; set; }
         public float Oleada { get; set; }
         #endregion
 
@@ -185,6 +186,7 @@ namespace ThunderingTanks.Objects
 
             if(siguienteOleada)
             {
+                spriteBatch.DrawString(WarIsOver, "TIEMPO SIGUIENTE OLEADA: " + (int)time + " SEGS", new Vector2(ScreenWidth - 1050, ScreenHeight - 475), Color.GreenYellow);
                 spriteBatch.DrawString(WarIsOver, "OLEADA COMPLETADA", new Vector2(ScreenWidth - 1005, ScreenHeight - 525), Color.GreenYellow);
                 spriteBatch.DrawString(WarIsOver, "SIGUIENTE OLEADA: " + Oleada, new Vector2(ScreenWidth - 1000, ScreenHeight - 500), Color.GreenYellow);
             }
